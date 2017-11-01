@@ -15,9 +15,9 @@ class UserInfo(models.Model):
 
     user_class_choice = (
         (1, '甲'),
-        (1, '乙'),
-        (1, '丙'),
-        (1, '丁'),
+        (2, '乙'),
+        (3, '丙'),
+        (4, '丁'),
     )
     user_class = models.IntegerField(verbose_name='班级',
                                      choices=user_class_choice, blank=True, null=True)
@@ -49,6 +49,10 @@ class UserInfo(models.Model):
     assessment = models.ManyToManyField('Assessment')
     # 职工和奖励属于多对多关系
     reward = models.ManyToManyField('Reward')
+    # 职工和休假属于多对多关系
+    leave = models.ManyToManyField('Leave')
+    # 职工和薪资属于一对多关系(一位工资一个月一次，一个人可以有很多工资单)
+    wage = models.ManyToManyField('Wage')
 
     class Meta:
         verbose_name = '职工表'
@@ -157,7 +161,7 @@ class Leave(models.Model):
     休假表
     年修、轮休、探亲、产假、护理假
     """
-    title = models.CharField(verbose_name='休假名称', max_length='32')
+    title = models.CharField(verbose_name='休假名称', max_length=32)
     money = models.IntegerField(verbose_name='扣款')
     begin = models.DateField(verbose_name='休假开始日期')
     end = models.DateField(verbose_name='休假结束日期')
@@ -166,5 +170,25 @@ class Leave(models.Model):
 class Wage(models.Model):
     """
     薪资表
+    薪资总额、基本工资、绩效工资、
     """
-    pass
+    all_money = models.IntegerField(verbose_name='工资总额')
+    basic_money = models.IntegerField(verbose_name='基本工资')
+    performance = models.IntegerField(verbose_name='绩效工资')
+
+    # 薪金和薪金详细应该是一对一关系
+    wage_detail = models.OneToOneField('WageDetail')
+
+
+class WageDetail(models.Model):
+    """
+    薪资详细
+    医疗保险、失业保险、工伤保险、养老保险、住房公积金
+    """
+    medical_insurance = models.IntegerField(verbose_name='医疗保险')
+    unemployment_insurance = models.IntegerField(verbose_name='失业保险')
+    injury_insurance = models.IntegerField(verbose_name='工伤保险')
+    pension = models.IntegerField(verbose_name='养老保险')
+    housing_fund = models.IntegerField(verbose_name='住房公积金')
+    leave_money = models.IntegerField(verbose_name='休假扣款')
+    reward_money = models.IntegerField(verbose_name='奖金')
