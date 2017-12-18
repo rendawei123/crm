@@ -115,3 +115,4 @@ class CurdSite(object):
         return self.get_urls(), self.name, self.namespace
 
 site = CurdSite()
+
